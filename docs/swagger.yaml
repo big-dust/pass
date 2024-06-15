@@ -1,0 +1,228 @@
+openapi: 3.0.0
+info:
+  title: OAuth 2.0 Authorization Server API
+  version: 1.0.0
+paths:
+  /user/send_verification_code:
+    post:
+      summary: 发送邮箱验证码
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: testuser@example.com
+      responses:
+        '200':
+          description: 验证码已发送
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 验证码已发送到您的邮箱
+        '400':
+          description: 请求错误
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 邮箱是必须的
+
+  /user/register:
+    post:
+      summary: 用户注册
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: testuser@example.com
+                password:
+                  type: string
+                  example: testpassword
+                verification_code:
+                  type: string
+                  example: 123456
+                avatar:
+                  type: string
+                  example: http://example.com/avatar.jpg
+                nickname:
+                  type: string
+                  example: testnickname
+      responses:
+        '201':
+          description: 用户注册成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 用户注册成功
+        '400':
+          description: 请求错误
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 邮箱已存在
+
+  /user/login:
+    post:
+      summary: 用户登录
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: testuser@example.com
+                password:
+                  type: string
+                  example: testpassword
+      responses:
+        '200':
+          description: 登录成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  auth_token:
+                    type: string
+                    example: generated_auth_token
+                  avatar:
+                    type: string
+                    example: http://example.com/avatar.jpg
+                  nickname:
+                    type: string
+                    example: testnickname
+        '401':
+          description: 无效的凭据
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 无效的凭据
+
+  /user/profile:
+    get:
+      summary: 查询个人信息
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                    example: testuser@example.com
+                  avatar:
+                    type: string
+                    example: http://example.com/avatar.jpg
+                  nickname:
+                    type: string
+                    example: testnickname
+        '401':
+          description: 未提供认证令牌或令牌无效
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 无效或过期的令牌
+        '404':
+          description: 用户未找到
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 用户未找到
+    put:
+      summary: 编辑个人信息
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                avatar:
+                  type: string
+                  example: http://example.com/new_avatar.jpg
+                nickname:
+                  type: string
+                  example: newnickname
+      responses:
+        '200':
+          description: 信息更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 用户信息更新成功
+        '401':
+          description: 未提供认证令牌或令牌无效
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 无效或过期的令牌
+        '404':
+          description: 用户未找到
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 用户未找到
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
